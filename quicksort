@@ -1,0 +1,53 @@
+# quicksort
+
+def quicksort(S, low, high):
+    if (high > low):
+        pivotpoint = partition(S, low, high)
+        quicksort(S, low, pivotpoint - 1)
+        quicksort(S, pivotpoint +1, high)
+
+# 편의상, 일단 리스트의 첫원소를 pivot으로 정의, pivot정하는 법은 나중에 배움
+# 기준 원소로 어떻게 리스트를 나눌 수 있을까?
+# 두 개의 인덱스(i,j)를 이용해서 비교와 교환
+
+def partition(S, low, high):
+    pivot_item = S[low]
+    j = low
+    for i in range(low + 1, high + 1):
+        if S[i] < pivot_item:
+            j += 1
+            S[i], S[j] = S[j], S[i]
+    pivotpoint = j
+    S[low], S[pivotpoint] = S[pivotpoint], S[low] # pivopint가 가운데에 가도록 해줌
+    return pivotpoint
+
+
+S = [15, 22, 13, 27, 12, 10, 20, 25]
+print('Before:', S)
+quicksort(S, 0, len(S)-1)
+print('After:', S)
+
+S = [15, 22, 13, 27, 12, 10, 20, 25]
+print('Before:', S)
+partition(S, 0, len(S)-1)
+print('After:', S)
+
+
+# partition 함수의 다른 구현 방법, 이걸 더 많이 사용
+# i는 앞에서 시작 j는 뒤에서 시작
+# i가 pivotpont보다 클 때까지 이동, j가 pivotpoint보다 작을때까지 이동해서 바꿔줌
+
+def partition2(S, low, high):
+    pivot_item = S[low]
+    i = low + 1
+    j = high
+    while (i <= j):
+        while (S[i] < pivot_item):
+            i += 1
+        while (S[j] > pivot_item):
+            j -= 1
+        if (i < j):   # i가 j보다 작을 때 까지만 계산
+            S[i], S[j] = S[j], S[i]
+    pivotpoint = j
+    S[low], S[pivotpoint] = S[pivotpoint], S[low]
+    return pivotpoint
