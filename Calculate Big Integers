@@ -1,0 +1,166 @@
+# Arithmetic for Large Integers 덧셈
+def ladd(u, v):
+    n = len(u) if len(u) > len(v) else len(v)
+    result = []
+    carry = 0
+    for k in range(n):
+        i = u[k] if k < len(u) else 0
+        j = v[k] if k < len(v) else 0
+        value = i + j + carry
+        carry = value // 10 # 올림 수
+        result.append(value%10) # 모둘로로 나머지만 구함
+    if (carry > 0) :  # 연산 다끝내고 제일 큰 자리수에서 carry가 남아 있는 경우
+        result.append(carry)
+    return result
+
+u = [3, 2, 1] #123을 뒤집어서 저장한 리스트
+v = [5, 4]
+print(123 + 45)
+print(ladd(u,v)[::-1]) #리스트 슬라이싱, 처음부터 끝까지 역순으로 표현
+
+
+u = [2, 3, 8, 7, 6, 5]
+v = [3, 2, 7, 3, 2, 4, 9]
+print(567832 + 9423723)
+print(ladd(u,v)[::-1])
+
+# 곱셈에서는 분할연산을 사용하지않으면 O(n^2)으로 연산값이 너무 커짐
+# 따라서 절반으로 값을 나누어 연산
+# 567832 = 567 * 10^3 + 832
+# u = x * 10^m + y
+# v = w * 10^m + z
+# n digits = [n/2]digits + [n/2]digits
+# m = n/2
+# uv = (x * 10^m + y)(w * 10^m + z) = xw * 10 ^2m + (xz + yw) * 10^m +yz
+# 한자리 수 곱셈이 될때까지 계속 분할
+
+def prod(u, v):
+    n = len(u) if len(u) > len(v) else len(v)
+    if len(u) == 0 or len == 0:
+        # print(u, v, [0])
+        return [0]
+    elif n <= threshold:
+        # print(u, v, lmult(u, v)[::-1])
+        return lmult(u, v)
+    else:
+        m = n // 2
+        x = div(u, m); y = rem(u, m)
+        w = div(v, m); z = rem(v, m)
+        p1 = prod(x, w)
+        p2 = ladd(prod(x, z), prod(w, y))
+        p3 = prod(y, z)
+        return ladd(ladd(exp(p1, 2*m), exp(p2, m)), p3)
+    
+
+# 567832 div 10^3 = 567
+# 567832 rem 10^3 = 832
+
+def exp(u, m):
+    if (u == [0]):
+        return [0]
+    else:
+        return ([0]*m) + u  # 0만큼 shift, m의 자리로 만들어줌 + reverse상태니까 0이 앞에 오도록
+    
+def div(u, m):
+    if len(u) < m:
+        u.append(0)
+    return u[m : len(u)]
+
+def rem(u, m):
+    if len(u) < m:
+        u.append(0)
+    return u[0 : m]
+
+# u = [2, 3, 8, 7, 6, 5]
+# v = [3, 2, 7, 3, 2, 4, 9]
+# print(exp(u, 3))  # function 확인
+# print(div(u, 3))
+# print(rem(u, 3))
+
+threshold = 1 # 특정 값까지 1로 지정
+
+def ladd(u, v):
+    n = len(u) if len(u) > len(v) else len(v)
+    result = []
+    carry = 0
+    for k in range(n):
+        i = u[k] if k < len(u) else 0
+        j = v[k] if k < len(v) else 0
+        value = i + j + carry
+        carry = value // 10 # 올림 수
+        result.append(value%10) # 모둘로로 나머지만 구함
+    if (carry > 0) :  # 연산 다끝내고 제일 큰 자리수에서 carry가 남아 있는 경우
+        result.append(carry)
+    return result
+
+def lmult(u, v):
+    i = u[0] if (0 < len(u)) else 0
+    j = v[0] if (0 < len(v)) else 0
+    value = i * j
+    carry = value // 10
+    result = []
+    result.append(value % 10)
+    if carry > 0:
+        result.append(carry)
+    return result
+
+u = [2, 3, 8, 7, 6, 5]
+v = [3, 2, 7, 3, 2, 4, 9]
+print(567832 * 9423723)
+print(prod(u, v)[::-1])
+
+
+# W(n) = 4W(n/2) + cn  # 재귀호출 4번
+# W(n) = 0(n^ln4) = 0(n^2)
+# 그냥 계산하는 것과 큰 차이가 없음
+# 재귀 호출 4번하니까 개선되는 점이 없음
+
+# 효율성 개선이 필요
+# r을 이용해서 재귀 호출을 3번으로 줄임
+# uv = xw * 10 ^ 2m + (xz + yw) * 10 ^ m  + yz
+# r = (x + y)(w + z) = xw + (xz + yw) + yz
+# (xz + yw) = r - (xw + yz)
+# 0(n^1.58)
+
+def prod2 (u, v):
+    n = len(u) if (len(u) > len(v)) else len(v)
+    if len(u) == 0 or len(v) == 0:
+        # print(u, v, [0])
+        return [0]
+    elif n <= threshold:
+        return lmult(u,v)
+    else:
+        m = n//2
+        x = div(u, m); y = rem(u, m)
+        w = div(v, m); z = rem(v, m)
+        r = prod2(ladd(x, y), ladd(w, z))
+        p1 = prod2(x, w)
+        p3 = prod2(y, z)
+        p2 = lsub(r, ladd(p1, p3))
+        return ladd(ladd(exp(p1, 2*m), exp(p2, m)), p3)
+    
+
+def lsub(u, v): #뺄셈 정의
+    n = len(u) if len(u) > len(v) else len(v)
+    result = []
+    borrow = 0
+    for k in range(n):
+        i = u[k] if k < len(u) else 0
+        j = v[k] if k < len(v) else 0
+        value = i - j + borrow
+        if value < 0:
+            value += 10
+            borrow = -1
+        else:
+            borrow = 10
+        result.append(value % 10)
+    if borrow < 0 :
+        print("음의 정수는 처리 못함.")
+    return result
+  
+
+
+u = [2, 3, 8, 7, 6, 5]
+v = [3, 2, 7, 3, 2, 4, 9]
+print(567832 * 9423723)
+print(prod2(u, v)[::-1])
