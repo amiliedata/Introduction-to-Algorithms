@@ -1,0 +1,64 @@
+# Dynamic Programming
+# Binomial Coefficient
+def bin(n, k):
+    if k == 0 or n == k:
+        return 1
+    else:
+        return bin(n - 1, k - 1) + bin(n - 1, k)
+    
+
+for n in range(10):
+    for k in range(n+1):
+        print(bin(n, k), end = " ")
+    print()
+
+
+# 중복호출이 계속 발생하는 문제점이 있음
+# 시간 복잡도 0(nCk)
+
+
+# Binomial Coefficient (Dynamic Programming)
+def bin2 (n, k):
+    B = [[0]*(k + 1) for _ in range(n + 1)] # n, k로 2차원 정렬
+    for i in range(n + 1):
+        for j in range(min(i, k) + 1): # i와 k중에서 더 작은 것
+            if j == 0 or j == i:
+                B[i][j] = 1
+            else:
+                B[i][j] = B[i - 1][j - 1] + B[i - 1][j]
+    return B[n][k]
+
+
+for n in range(10):
+    for k in range(n+1):
+        print(bin2(n, k), end = " ")
+    print()
+
+
+# 시간 복잡도 개선 0(nk)
+
+
+# 좌우가 대칭되어 있기 때문에, k가 2/n 보다 클경우 k를 반절로 줄일 수 있음
+# 1차원 리스트로 바꾸기, 뒤에서 부터 저장하면 덮어 쓰지 않고 저장 가능
+
+def bin3 (n, k):
+    if k > n//2:
+        k = n - k
+    B = [0] * (k + 1)
+    B[0] = 1
+    for i in range(1, n + 1):
+        j = min(i, k)
+        while (j > 0):
+            B[j] = B[j] + B[j -1]
+            j -= 1
+        #for n in range(min(i, k) + 1):
+            #print(B[n], end =" ")
+        #print()
+    return B[k]
+
+for n in range(10):
+    for k in range(n+1):
+        print(bin3(n, k), end = " ")
+    print()
+
+print(bin3(9,5))
