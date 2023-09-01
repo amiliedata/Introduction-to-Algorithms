@@ -1,0 +1,65 @@
+# Floyd's Algorithm for Shortest Paths
+
+def floyd (W):
+    D = W
+    n = len(W)
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                D[i][j] = min(D[i][j], D[i][k] + D[k][j])
+        # print('k=', k)
+        # for i in range(len(D)):
+            # print(D[i])
+    return D
+
+INF = 999
+W = [
+    [0, 1, INF, 1, 5],
+    [9, 0, 3, 2, INF],
+    [INF, INF, 0, 4, INF],
+    [INF, INF, 2, 0, 3],
+    [3, INF, INF, INF, 0]
+]
+
+D = floyd(W)
+for i in range(len(D)):
+    print(D[i])
+
+
+# 최단 경로의 길이를 구한 것일 뿐 최단 경로를 구한것은 아님
+# 최단 경로를 구하기 위해서는 그 과정을 기록해야함
+
+def floyd2 (W):
+    n = len(W)
+    D = W
+    P = [[-1]*n for _ in range(n)]
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if D[i][j] > D[i][k] + D[k][j]:
+                    D[i][j] = D[i][k] + D[k][j]
+                    P[i][j] = k
+    return D, P 
+
+
+# P[i][j] = -1 이면, (Vi, Vj) 가 최단 경로임
+# P[i][j] = k 인 경우, inorder 탐색. (Vi, Vk)의 최단 경로 출력 후, Vk를 출력하고, (Vk, Vj)의 최단 경로 출력
+
+def path (P, u, v): # u = 출발정점, v = 도착정점
+    if P[u][v] != -1 :
+        path(P, u, P[u][v])  # P[u][v] = k
+        print('v%d'%(P[u][v]), end='-> ')
+        path(P, P[u][v], v)
+
+D, P = floyd2(W)
+for i in range(len(D)):
+    print(D[i])
+for i in range(len(P)):
+    print(P[i])
+
+u = 1
+v = 4
+print('shortest path from v%d to v%d:'%(u, v), end = ' ')
+print('v%d'%(u), end ='-> ')
+path(P, u, v)
+print('v%d'%(v), end=' ')
